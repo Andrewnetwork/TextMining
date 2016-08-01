@@ -63,6 +63,8 @@ def CAPM( textDigest ,dictionarySet, segmentSize ):
 
         for word1 in segment:
             if word1 in dictionarySet:
+                # Add to the diagnal to represent this words occurance in a segment.
+                coOccurMatrix[wordIndex[word1], wordIndex[word1]] += 1
                 for word2 in segmentInner:
                     if word2 in dictionarySet and word2 != word1:
                         coOccurMatrix[wordIndex[word1], wordIndex[word2]] += 1
@@ -102,6 +104,7 @@ def test1():
 
 def test2():
     path = "../TextCorpus/Philosophy/Plato_Apology.txt"
+    #path = "../TextCorpus/Philosophy/Plato_Apology.txt"
     #path = "../TextCorpus/Misc/AR_BlogBlurb1.txt"
     #path = "../TextCorpus/Misc/OneSentence.txt"
 
@@ -160,7 +163,35 @@ def matrixExplore():
         except:
             print("%s not in text."%inWord)
 
+def staticExplore():
+    #path = "../TextCorpus/Fiction/JamesJoyce_Ulysses.txt"
+    #path = "../TextCorpus/Philosophy/Plato_Apology.txt"
+    path = "../TextCorpus/Fiction/LeoTolstoy_WarAndPeace.txt"
+    dict = wordFrequencies(path, 1, returnOnlyDictionary=True)
+
+    print( dict )
+    [wordIndex, coMatrix] = CAPM(digestText_sentences(path), dict, 1)
+
+    inv_map = {v: k for k, v in wordIndex.items()}
+
+    while True:
+        inWord = raw_input("Enter a word to explore it's associations: ")
+        upperBound = raw_input("Upper freq bound: ")
+
+        assoc = []
+        col = 0
+        try:
+            for freq in coMatrix[wordIndex[inWord], :]:
+                if (freq <= int(upperBound)):
+                    assoc.append((inv_map[col], freq))
+
+                col += 1
+
+            print(sorted(assoc, key=(lambda (x): x[1]), reverse=True))
+        except:
+            print("%s not in text." % inWord)
 
 #test1()
-#test2()
-matrixExplore()
+staticExplore()
+#matrixExplore()
+#staticExplore()
